@@ -18,7 +18,7 @@
 package org.apache.spark.examples.datalog
 
 import java.nio.file.{Files, Paths}
-
+import java.io.File
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{Row, SQLContext}
 import org.apache.spark.{SparkConf, SparkContext}
@@ -56,6 +56,7 @@ object Experiments {
       case 71 => "BigDatalog Triangle Counting"
       case 72 => "BigDatalog Triangle Closing (PYMK)"
       case 73 => "BigDatalog Triangle Closing (PYMK) + join & sort"
+      case 90 => "BigDatalog WatDiv"
       case 99 => "Ad-hoc"
       case _ => throw new IllegalArgumentException("Invalid program.")
     }
@@ -143,11 +144,12 @@ object Experiments {
       }
       case 99 => {
         // example input:
-        // program=99 file=test.deal queryform=prg(A) baserelation_name1=arc.txt baserelation_name2=name2.txt generator=1
+        // program=99 file=program.deal queryform=prg(A) edb=facts generator=1
+        //p._1.startsWith("baserelation_")).map(x => (x._1.substring(x._1.indexOf("_") + 1), x._2))
         val inputFilePath = options("file")
         val queryForm = options("queryform")
-        val baseRelationFilePaths = options.filter(p => p._1.startsWith("baserelation_")).map(x => (x._1.substring(x._1.indexOf("_") + 1), x._2))
-        val result = runAdHoc(bigDatalogCtx, inputFilePath, queryForm, baseRelationFilePaths, options)
+        val baseRelationFolderPath = options("edb")
+        val result = runAdHoc(bigDatalogCtx, inputFilePath, queryForm, baseRelationFolderPath, options)
         println("execution time: " + (System.currentTimeMillis() - start) + " ms, " + options("queryform") + " size: " + result.count())
       }
     }
@@ -290,18 +292,14 @@ object Experiments {
   def runAdHoc(bigDatalogCtx: BigDatalogContext,
                filePath: String,
                queryForm: String,
-               baseRelationFilePaths: Map[String, String],
+               baseRelationFolderPath: String,
                options: Map[String, String]): RDD[Row] = {
-    val rawProgram = new StringBuilder
-    Files.readAllLines(Paths.get(filePath))
-      .toArray()
-      .foreach(line => rawProgram.append(line))
 
     var result: RDD[Row] = null
 
-    if (bigDatalogCtx.loadDatalogFile(rawProgram.toString())) {
-      for (baseRelationFilePath <- baseRelationFilePaths)
-        bigDatalogCtx.registerAndLoadTable(baseRelationFilePath._1, baseRelationFilePath._2, bigDatalogCtx.conf.numShufflePartitions)
+    if (bigDatalogCtx.loadDatalogFile(filePath)) {
+      for (baseRelationFilePath <- getListOfFiles(baseRelationFolderPath))
+        bigDatalogCtx.registerAndLoadTable(baseRelationFilePath.getAbsolutePath, baseRelationFilePath.getName.split('.').head, bigDatalogCtx.conf.numShufflePartitions)
 
       val program = bigDatalogCtx.query(queryForm)
       result = program.execute()
@@ -310,5 +308,14 @@ object Experiments {
     bigDatalogCtx.reset()
 
     result
+  }
+
+  def getListOfFiles(dir: String):List[File] = {
+      val d = new File(dir)
+      if (d.exists && d.isDirectory) {
+          d.listFiles.filter(_.isFile).toList
+      } else {
+          List[File]()
+      }
   }
 }
