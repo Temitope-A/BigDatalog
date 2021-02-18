@@ -298,8 +298,10 @@ object Experiments {
     var result: RDD[Row] = null
 
     if (bigDatalogCtx.loadDatalogFile(filePath)) {
-      for (baseRelationFilePath <- getListOfFiles(baseRelationFolderPath))
-        bigDatalogCtx.registerAndLoadTable(baseRelationFilePath.getAbsolutePath, baseRelationFilePath.getName.split('.').head, bigDatalogCtx.conf.numShufflePartitions)
+      for (edbFile <- getListOfFiles(baseRelationFolderPath)) {
+        println("base relation discovered: " + edbFile.getAbsolutePath)
+        bigDatalogCtx.registerAndLoadTable(edbFile.getName.split('.').head, edbFile.getAbsolutePath, bigDatalogCtx.conf.numShufflePartitions)
+      }
 
       val program = bigDatalogCtx.query(queryForm)
       result = program.execute()
