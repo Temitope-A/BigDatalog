@@ -19,6 +19,7 @@ package org.apache.spark.examples.datalog
 
 import java.nio.file.{Files, Paths}
 import java.io.File
+import org.apache.log4j.{Level, Logger}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{Row, SQLContext}
 import org.apache.spark.{SparkConf, SparkContext}
@@ -68,6 +69,8 @@ object Experiments {
       sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
 
     val sc = new SparkContext(sparkConf)
+    val rootLogger = Logger.getRootLogger()
+    rootLogger.setLevel(Level.ERROR)
 
     if (options.contains("checkpointdir"))
       sc.setCheckpointDir(options("checkpointdir"))
