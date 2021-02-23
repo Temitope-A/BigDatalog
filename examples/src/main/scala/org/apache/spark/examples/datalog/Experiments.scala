@@ -43,6 +43,7 @@ object Experiments {
 
     val filePath: String = options("file")
 
+
     val programName = options("program").toInt match {
       case 11 => "BigDatalog-TC-LL"
       case 12 => "BigDatalog-TC-RL"
@@ -57,6 +58,7 @@ object Experiments {
       case 72 => "BigDatalog Triangle Closing (PYMK)"
       case 73 => "BigDatalog Triangle Closing (PYMK) + join & sort"
       case 90 => "BigDatalog WatDiv"
+      case 98 => "Ad-hoc"
       case 99 => "Ad-hoc"
       case _ => throw new IllegalArgumentException("Invalid program.")
     }
@@ -68,6 +70,13 @@ object Experiments {
       sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
 
     val sc = new SparkContext(sparkConf)
+
+    val programId = options("program").toInt
+    if (programId == 98){
+      val rootLogger = Logger.getRootLogger()
+      rootLogger.setLevel(Level.INFO)
+      programId = 99
+    }
 
     if (options.contains("checkpointdir"))
       sc.setCheckpointDir(options("checkpointdir"))
@@ -82,7 +91,6 @@ object Experiments {
 
     val start = System.currentTimeMillis()
 
-    val programId = options("program").toInt
 
     val bigDatalogCtx = new BigDatalogContext(sc)
     options.foreach(opt => bigDatalogCtx.getConf.set(opt._1, opt._2))
