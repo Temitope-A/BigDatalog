@@ -44,7 +44,14 @@ object Experiments {
 
     val filePath: String = options("file")
 
-    val programName = options("program").toInt match {
+    val programId = options("program").toInt
+    if(programId == 98){
+      val rootLogger = Logger.getRootLogger()
+      rootLogger.setLevel(Level.INFO)
+      programId = 99
+    }
+
+    val programName = programId match {
       case 11 => "BigDatalog-TC-LL"
       case 12 => "BigDatalog-TC-RL"
       case 13 => "BigDatalog-TC-NL"
