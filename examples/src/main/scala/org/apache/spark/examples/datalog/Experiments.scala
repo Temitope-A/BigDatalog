@@ -18,6 +18,7 @@
 package org.apache.spark.examples.datalog
 
 import java.nio.file.{Files, Paths}
+import org.apache.log4j.{Level, Logger}
 import java.io.File
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{Row, SQLContext}
@@ -71,7 +72,7 @@ object Experiments {
 
     val sc = new SparkContext(sparkConf)
 
-    val programId = options("program").toInt
+    var programId = options("program").toInt
     if (programId == 98){
       val rootLogger = Logger.getRootLogger()
       rootLogger.setLevel(Level.INFO)
