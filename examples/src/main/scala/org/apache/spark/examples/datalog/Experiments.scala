@@ -75,7 +75,7 @@ object Experiments {
     var programId = options("program").toInt
     if (programId == 98){
       val rootLogger = Logger.getRootLogger()
-      rootLogger.setLevel(Level.INFO)
+      rootLogger.setLevel(Level.ERROR)
       programId = 99
     }
 
