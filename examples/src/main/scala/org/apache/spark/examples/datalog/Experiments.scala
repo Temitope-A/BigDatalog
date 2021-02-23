@@ -44,7 +44,14 @@ object Experiments {
 
     val filePath: String = options("file")
 
-    val programName = options("program").toInt match {
+    val programId = options("program").toInt
+    if(programCode == 98){
+      val rootLogger = Logger.getRootLogger()
+      rootLogger.setLevel(Level.INFO)
+      programId = 99
+    }
+
+    val programName = programId match {
       case 11 => "BigDatalog-TC-LL"
       case 12 => "BigDatalog-TC-RL"
       case 13 => "BigDatalog-TC-NL"
@@ -69,8 +76,6 @@ object Experiments {
       sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
 
     val sc = new SparkContext(sparkConf)
-    val rootLogger = Logger.getRootLogger()
-    rootLogger.setLevel(Level.ERROR)
 
     if (options.contains("checkpointdir"))
       sc.setCheckpointDir(options("checkpointdir"))
@@ -84,8 +89,6 @@ object Experiments {
     println(options)
 
     val start = System.currentTimeMillis()
-
-    val programId = options("program").toInt
 
     val bigDatalogCtx = new BigDatalogContext(sc)
     options.foreach(opt => bigDatalogCtx.getConf.set(opt._1, opt._2))
@@ -150,10 +153,10 @@ object Experiments {
         // program=99 file=program.deal queryform=prg(A) edb=facts generator=1
         //p._1.startsWith("baserelation_")).map(x => (x._1.substring(x._1.indexOf("_") + 1), x._2))
         val inputFilePath = options("file")
-        val queryForm = options("queryform")
+        val queryFilePath = options("query")
         val baseRelationFolderPath = options("edb")
-        val result = runAdHoc(bigDatalogCtx, inputFilePath, queryForm, baseRelationFolderPath, options)
-        println("execution time: " + (System.currentTimeMillis() - start) + " ms, " + options("queryform") + " size: " + result.count())
+        val result = runAdHoc(bigDatalogCtx, inputFilePath, queryFilePath, baseRelationFolderPath, options)
+        println("execution time: " + (System.currentTimeMillis() - start) + " ms, " + options("query") + " size: " + result.count())
       }
     }
 
@@ -294,11 +297,17 @@ object Experiments {
 
   def runAdHoc(bigDatalogCtx: BigDatalogContext,
                filePath: String,
-               queryForm: String,
+               queryFilePath: String,
                baseRelationFolderPath: String,
                options: Map[String, String]): RDD[Row] = {
 
     var result: RDD[Row] = null
+
+    val queries = new Vector[String];
+
+    Files.readAllLines(Paths.get(queryFilePath))
+      .toArray()
+      .foreach(line => queries.)
 
     if (bigDatalogCtx.loadDatalogFile(filePath)) {
       for (edbFile <- getListOfFiles(baseRelationFolderPath)) {
@@ -306,7 +315,8 @@ object Experiments {
         bigDatalogCtx.registerAndLoadTable(edbFile.getName.split('.').head, edbFile.getAbsolutePath, bigDatalogCtx.conf.numShufflePartitions)
       }
 
-      val program = bigDatalogCtx.query(queryForm)
+      val program1 = bigDatalogCtx.query(queryForm)
+
       result = program.execute()
     }
 
