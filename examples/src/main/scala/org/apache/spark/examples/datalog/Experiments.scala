@@ -19,7 +19,6 @@ package org.apache.spark.examples.datalog
 
 import java.nio.file.{Files, Paths}
 import java.io.File
-import org.apache.log4j.{Level, Logger}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{Row, SQLContext}
 import org.apache.spark.{SparkConf, SparkContext}
@@ -44,14 +43,7 @@ object Experiments {
 
     val filePath: String = options("file")
 
-    val programId = options("program").toInt
-    if(programId == 98){
-      val rootLogger = Logger.getRootLogger()
-      rootLogger.setLevel(Level.INFO)
-      programId = 99
-    }
-
-    val programName = programId match {
+    val programName = options("program").toInt match {
       case 11 => "BigDatalog-TC-LL"
       case 12 => "BigDatalog-TC-RL"
       case 13 => "BigDatalog-TC-NL"
@@ -76,8 +68,6 @@ object Experiments {
       sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
 
     val sc = new SparkContext(sparkConf)
-    val rootLogger = Logger.getRootLogger()
-    rootLogger.setLevel(Level.ERROR)
 
     if (options.contains("checkpointdir"))
       sc.setCheckpointDir(options("checkpointdir"))
