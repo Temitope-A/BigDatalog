@@ -73,9 +73,11 @@ object Experiments {
     val sc = new SparkContext(sparkConf)
 
     var programId = options("program").toInt
+    val rootLogger = Logger.getRootLogger()
+    rootLogger.setLevel(Level.ERROR)
+
     if (programId == 98){
-      val rootLogger = Logger.getRootLogger()
-      rootLogger.setLevel(Level.ERROR)
+      rootLogger.setLevel(Level.INFO)
       programId = 99
     }
 
