@@ -174,6 +174,7 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
         println(operator.getName)
         val joinConditions = ListBuffer.empty[JoinCondition]
         operator.asInstanceOf[JoinOperator].getConditions.foreach(jc => {
+          println(jc.leftRelationIndex,jc.rightRelationIndex)
           val leftOperator = getRelation(operator.getChild(jc.leftRelationIndex))
           val rightOperator = getRelation(operator.getChild(jc.rightRelationIndex))
           joinConditions += new JoinCondition(leftOperator.getName,
@@ -184,7 +185,6 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
         var key: String = getRelationAlias(plan)
         var used = Set.empty[String]
         used += key
-        println(used)
 
         var rightPlan: LogicalPlan = null
         var operatorKey: String = null
@@ -249,7 +249,7 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
           used += key
           println(used)
         }
-        plan = Subquery(operator.getName,plan)
+        //plan = Subquery(operator.getName,plan)
         plan
       case OperatorType.PROJECT =>
         val subPlan = getPlan(operator.getChild(0), recursivePlanDetails)
@@ -470,14 +470,14 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
       case other => {
         println("nomatch")
         println(plan)
-        "offers"
+        "offers_I"
         //null
       }
     }
   }
 
   def getRelation(operator: Operator) = {
-    val relationTypes = Set(OperatorType.BASE_RELATION, OperatorType.RECURSIVE_RELATION, OperatorType.UNION,
+    val relationTypes = Set(OperatorType.JOIN,OperatorType.BASE_RELATION, OperatorType.RECURSIVE_RELATION, OperatorType.UNION,
       OperatorType.AGGREGATE, OperatorType.AGGREGATE_FS, OperatorType.RECURSIVE_CLIQUE, OperatorType.MUTUAL_RECURSIVE_CLIQUE)
     var next = operator
     while (!relationTypes.contains(next.getOperatorType)) {
