@@ -248,7 +248,6 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
           }
           used += key
           println(used)
-          println("this join")
         }
         plan
       case OperatorType.PROJECT =>
@@ -470,7 +469,7 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
       case other => {
         println("nomatch")
         println(plan)
-        "offers_I"
+        "offers"
         //null
       }
     }
