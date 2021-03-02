@@ -249,6 +249,7 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
           used += key
           println(used)
         }
+        plan = Subquery(operator.getName,plan)
         plan
       case OperatorType.PROJECT =>
         val subPlan = getPlan(operator.getChild(0), recursivePlanDetails)
