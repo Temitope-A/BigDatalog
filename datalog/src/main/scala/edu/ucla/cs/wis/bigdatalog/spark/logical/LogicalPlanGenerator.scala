@@ -477,9 +477,12 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
   }
 
   def getRelation(operator: Operator) = {
-    val relationTypes = Set(OperatorType.JOIN,OperatorType.BASE_RELATION, OperatorType.RECURSIVE_RELATION, OperatorType.UNION,
+    val relationTypes = Set(OperatorType.BASE_RELATION, OperatorType.RECURSIVE_RELATION, OperatorType.UNION,
       OperatorType.AGGREGATE, OperatorType.AGGREGATE_FS, OperatorType.RECURSIVE_CLIQUE, OperatorType.MUTUAL_RECURSIVE_CLIQUE)
     var next = operator
+    if (next.getOperatorType == OperatorType.JOIN){
+      return "includes"
+    }
     while (!relationTypes.contains(next.getOperatorType)) {
       next = next.getChild(0)
     }
