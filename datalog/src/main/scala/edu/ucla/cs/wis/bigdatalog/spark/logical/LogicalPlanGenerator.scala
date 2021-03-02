@@ -246,6 +246,9 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
           }
           used += key
           println(used)
+          println("this join")
+          println(plan.alias)
+          println(plan.name)
         }
         plan
       case OperatorType.PROJECT =>
@@ -463,6 +466,7 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
       case r: Recursion => r.name
       case lr: LinearRecursiveRelation => lr._name
       case nl: NonLinearRecursiveRelation => nl._name
+      case j: Join => j.name
       case other => {
         println("nomatch")
         println(plan)
