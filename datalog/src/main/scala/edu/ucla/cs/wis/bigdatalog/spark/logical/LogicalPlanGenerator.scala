@@ -463,7 +463,11 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
       case r: Recursion => r.name
       case lr: LinearRecursiveRelation => lr._name
       case nl: NonLinearRecursiveRelation => nl._name
-      case other => null
+      case other => {
+        println("nomatch")
+        println(plan)
+        null
+      }
     }
   }
 
