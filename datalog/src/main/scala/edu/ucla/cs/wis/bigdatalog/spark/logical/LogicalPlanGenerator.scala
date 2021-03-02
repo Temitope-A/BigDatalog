@@ -178,7 +178,9 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
           val rightOperator = getRelation(operator.getChild(jc.rightRelationIndex))
           joinConditions += new JoinCondition(leftOperator.getName,
             jc.getLeft.toString, rightOperator.getName, jc.getRight.toString)
+          println("join condition")
         })
+        println("join conditions processed")
         var plan = childPlans.get(0)
         var key: String = getRelationAlias(plan)
         var used = Set.empty[String]
