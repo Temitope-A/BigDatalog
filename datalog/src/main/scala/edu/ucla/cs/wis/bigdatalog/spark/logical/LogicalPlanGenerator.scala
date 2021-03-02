@@ -179,7 +179,6 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
           joinConditions += new JoinCondition(leftOperator.getName,
             jc.getLeft.toString, rightOperator.getName, jc.getRight.toString)
         })
-        logInfo("computed join")
         var plan = childPlans.get(0)
         var key: String = getRelationAlias(plan)
         var used = Set.empty[String]
@@ -541,11 +540,11 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
     for (jc <- joinConditions) {
       val leftName = jc.leftRelationName
       val rightName = jc.rightRelationName
-      if (used.contains(leftName) && rightName.equals(key)) {
+      //if (used.contains(leftName) && rightName.equals(key)) {
         matchingJoinConditions += EqualTo(UnresolvedAttribute(Seq(leftName, jc.leftRelationColumnName)),
           UnresolvedAttribute(Seq(rightName, jc.rightRelationColumnName)))
         joinConditions -= jc
-      }
+      //}
     }
 
     var joinCondition: Expression = null
