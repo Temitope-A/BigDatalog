@@ -179,7 +179,7 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
           joinConditions += new JoinCondition(leftOperator.getName,
             jc.getLeft.toString, rightOperator.getName, jc.getRight.toString)
         })
-
+        logInfo("computed join")
         var plan = childPlans.get(0)
         var key: String = getRelationAlias(plan)
         var used = Set.empty[String]
