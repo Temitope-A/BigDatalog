@@ -171,7 +171,7 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
           plan
       case OperatorType.JOIN =>
         val childPlans = operator.getChildren().map(child => getPlan(child, recursivePlanDetails)).toList
-
+        println(operator.getName)
         val joinConditions = ListBuffer.empty[JoinCondition]
         operator.asInstanceOf[JoinOperator].getConditions.foreach(jc => {
           val leftOperator = getRelation(operator.getChild(jc.leftRelationIndex))
@@ -180,11 +180,11 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
             jc.getLeft.toString, rightOperator.getName, jc.getRight.toString)
           println(leftOperator.getName,jc.getLeft.toString, rightOperator.getName, jc.getRight.toString)
         })
-        println("join conditions processed")
         var plan = childPlans.get(0)
         var key: String = getRelationAlias(plan)
         var used = Set.empty[String]
         used += key
+        println(used)
 
         var rightPlan: LogicalPlan = null
         var operatorKey: String = null
@@ -245,6 +245,7 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
             plan = Join(plan, rightPlan, Inner, getJoinCondition(key, used, joinConditions))
           }
           used += key
+          println(used)
         }
         plan
       case OperatorType.PROJECT =>
