@@ -470,7 +470,7 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
       case other => {
         println("nomatch")
         println(plan)
-        "offers_I"
+        "includes"
         //null
       }
     }
