@@ -53,7 +53,7 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
   val COUNT_DISTINCT = "countd" // DeAL naming for count distinct
   var cliqueOperatorStack = new Stack[CliqueOperator]
   val recursiveRelationNames = new HashSet[String]
-  val baseRelationColumnMap = new Map[String, String]
+  val baseRelationColumnMap = new HashMap.empty[String, String]
 
   val gpsi: GeneralizedPivotSetInfo = {
     if (!operatorProgram.getArguments.hasConstant)
@@ -179,7 +179,7 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
           val rightRelationName = getRelation(operator.getChild(jc.rightRelationIndex), jc.getRight.toString)
           joinConditions += new JoinCondition(leftRelationName,
             jc.getLeft.toString, rightRelationName, jc.getRight.toString)
-          println(leftOperator.getName,jc.getLeft.toString, rightOperator.getName, jc.getRight.toString)
+          println(leftRelationName,jc.getLeft.toString, rightRelationName, jc.getRight.toString)
         })
         var plan = childPlans.get(0)
         var key: String = getRelationAlias(plan)
@@ -466,13 +466,10 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
       case r: Recursion => r.name
       case lr: LinearRecursiveRelation => lr._name
       case nl: NonLinearRecursiveRelation => nl._name
-      //case j: Join => j.name
-      case other => {
-        println("nomatch")
-        println(plan)
-        "includes"
-        //null
-      }
+      //case j: Join => {
+        //baseRelationColumnMap[columnName]
+      //}
+      case other => null
     }
   }
 
@@ -491,16 +488,6 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
     }
     baseRelationColumnMap.add(columnName,next.getName)
     next.getName
-  }
-
-  def getJoinedRelation(operator: Operator) = {
-    val relationTypes = Set(OperatorType.BASE_RELATION, OperatorType.RECURSIVE_RELATION, OperatorType.UNION,
-      OperatorType.AGGREGATE, OperatorType.AGGREGATE_FS, OperatorType.RECURSIVE_CLIQUE, OperatorType.MUTUAL_RECURSIVE_CLIQUE)
-    var next = operator
-    while (!relationTypes.contains(next.getOperatorType)) {
-      next = next.getChild(0)
-    }
-    next
   }
 
   def toExpressionFromVariable(operators: Seq[Operator])(v: Variable): UnresolvedAttribute = UnresolvedAttribute(v.getName)
@@ -570,13 +557,12 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
       val leftName = jc.leftRelationName
       val rightName = jc.rightRelationName
       println(leftName,rightName)
-      println("used")
       println(used)
-      if (used.contains(leftName) && rightName.equals(key)) {
+      //if (used.contains(leftName) && rightName.equals(key)) {
         matchingJoinConditions += EqualTo(UnresolvedAttribute(Seq(leftName, jc.leftRelationColumnName)),
           UnresolvedAttribute(Seq(rightName, jc.rightRelationColumnName)))
         joinConditions -= jc
-      }
+      //}
     }
 
     var joinCondition: Expression = null
