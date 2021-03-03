@@ -480,6 +480,8 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
     var next = operator
     while (!relationTypes.contains(next.getOperatorType)) {
       if(next.getOperatorType == OperatorType.JOIN){
+        println("met a join")
+        println(baseRelationColumnMap)
         baseRelationColumnMap(columnName.substring(1))
       }
       else{
