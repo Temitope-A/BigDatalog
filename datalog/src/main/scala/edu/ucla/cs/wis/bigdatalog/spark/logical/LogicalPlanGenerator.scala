@@ -53,6 +53,7 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
   val COUNT_DISTINCT = "countd" // DeAL naming for count distinct
   var cliqueOperatorStack = new Stack[CliqueOperator]
   val recursiveRelationNames = new HashSet[String]
+  val baseRelationColumnMap = new Map[String, String]
 
   val gpsi: GeneralizedPivotSetInfo = {
     if (!operatorProgram.getArguments.hasConstant)
@@ -174,11 +175,10 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
         println(operator.getName)
         val joinConditions = ListBuffer.empty[JoinCondition]
         operator.asInstanceOf[JoinOperator].getConditions.foreach(jc => {
-          println(jc.leftRelationIndex,jc.rightRelationIndex)
-          val leftOperator = getRelation(operator.getChild(jc.leftRelationIndex))
-          val rightOperator = getRelation(operator.getChild(jc.rightRelationIndex))
-          joinConditions += new JoinCondition(leftOperator.getName,
-            jc.getLeft.toString, rightOperator.getName, jc.getRight.toString)
+          val leftRelationName = getRelation(operator.getChild(jc.leftRelationIndex), jc.getLeft.toString)
+          val rightRelationName = getRelation(operator.getChild(jc.rightRelationIndex), jc.getRight.toString)
+          joinConditions += new JoinCondition(leftRelationName,
+            jc.getLeft.toString, rightRelationName, jc.getRight.toString)
           println(leftOperator.getName,jc.getLeft.toString, rightOperator.getName, jc.getRight.toString)
         })
         var plan = childPlans.get(0)
@@ -476,19 +476,21 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
     }
   }
 
-  def getRelation(operator: Operator) = {
+  def getRelation(operator: Operator, columnName: String): String = {
     val relationTypes = Set(OperatorType.BASE_RELATION, OperatorType.RECURSIVE_RELATION, OperatorType.UNION,
       OperatorType.AGGREGATE, OperatorType.AGGREGATE_FS, OperatorType.RECURSIVE_CLIQUE, OperatorType.MUTUAL_RECURSIVE_CLIQUE)
-    var next = operator
 
+    var next = operator
     while (!relationTypes.contains(next.getOperatorType)) {
-      if(next.getOperatorType == OperatorType.JOIN){
-        next = next.getChild(1)
+      if(operator.getOperatorType == OperatorType.JOIN){
+        baseRelationColumnMap[columnName]
       }
-      else
+      else{
         next = next.getChild(0)
+      }
     }
-    next
+    baseRelationColumnMap.add(columnName,next.getName)
+    next.getName
   }
 
   def getJoinedRelation(operator: Operator) = {
