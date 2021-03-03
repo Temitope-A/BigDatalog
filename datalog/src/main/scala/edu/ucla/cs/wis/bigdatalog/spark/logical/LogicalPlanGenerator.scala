@@ -486,7 +486,7 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
         next = next.getChild(0)
       }
     }
-    baseRelationColumnMap.add(columnName,next.getName)
+    baseRelationColumnMap.put(columnName,next.getName)
     next.getName
   }
 
