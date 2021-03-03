@@ -53,7 +53,7 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
   val COUNT_DISTINCT = "countd" // DeAL naming for count distinct
   var cliqueOperatorStack = new Stack[CliqueOperator]
   val recursiveRelationNames = new HashSet[String]
-  val baseRelationColumnMap = new HashMap.empty[String, String]
+  val baseRelationColumnMap = HashMap.empty[String, String]
 
   val gpsi: GeneralizedPivotSetInfo = {
     if (!operatorProgram.getArguments.hasConstant)
