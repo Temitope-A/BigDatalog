@@ -478,11 +478,10 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
       OperatorType.AGGREGATE, OperatorType.AGGREGATE_FS, OperatorType.RECURSIVE_CLIQUE, OperatorType.MUTUAL_RECURSIVE_CLIQUE)
 
     var next = operator
+    var result: String = null;
     while (!relationTypes.contains(next.getOperatorType)) {
       if(next.getOperatorType == OperatorType.JOIN){
-        println("met a join")
-        println(baseRelationColumnMap)
-        baseRelationColumnMap(columnName.substring(1))
+        result = baseRelationColumnMap(columnName.substring(1))
       }
       else{
         next = next.getChild(0)
@@ -490,7 +489,8 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
     }
     baseRelationColumnMap.put(columnName.substring(1),next.getName)
     println(baseRelationColumnMap)
-    next.getName
+    result = next.getName
+    result
   }
 
   def toExpressionFromVariable(operators: Seq[Operator])(v: Variable): UnresolvedAttribute = UnresolvedAttribute(v.getName)
