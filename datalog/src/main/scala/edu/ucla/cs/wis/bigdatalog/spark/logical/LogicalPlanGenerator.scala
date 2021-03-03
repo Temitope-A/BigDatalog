@@ -487,8 +487,8 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
       }
     }
     baseRelationColumnMap.put(columnName.substring(1),next.getName)
-    next.getName
     println(baseRelationColumnMap)
+    next.getName
   }
 
   def toExpressionFromVariable(operators: Seq[Operator])(v: Variable): UnresolvedAttribute = UnresolvedAttribute(v.getName)
