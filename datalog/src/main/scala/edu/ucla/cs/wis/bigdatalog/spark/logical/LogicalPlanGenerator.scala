@@ -480,14 +480,15 @@ class LogicalPlanGenerator(operatorProgram: OperatorProgram, bigDatalogContext: 
     var next = operator
     while (!relationTypes.contains(next.getOperatorType)) {
       if(operator.getOperatorType == OperatorType.JOIN){
-        baseRelationColumnMap(columnName)
+        baseRelationColumnMap(.substring(1))
       }
       else{
         next = next.getChild(0)
       }
     }
-    baseRelationColumnMap.put(columnName,next.getName)
+    baseRelationColumnMap.put(columnName.substring(1),next.getName)
     next.getName
+    println(baseRelationColumnMap)
   }
 
   def toExpressionFromVariable(operators: Seq[Operator])(v: Variable): UnresolvedAttribute = UnresolvedAttribute(v.getName)
